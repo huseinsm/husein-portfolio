@@ -1,0 +1,137 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-bg: #07080c;
+  --color-surface: #0d0f16;
+  --color-surface-2: #12151f;
+  --color-line: #1e2230;
+  --color-fg: #e8eaf2;
+  --color-muted: #8b91a7;
+  --color-accent: #5eead4;
+  --color-accent-2: #a78bfa;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-fg);
+}
+
+::selection {
+  background: rgb(94 234 212 / 0.3);
+}
+
+/* Every content section shares the same spacing, so gaps between sections are equal.
+   scroll-margin keeps headings clear of the fixed navbar when jumping via nav links. */
+@utility section {
+  margin-inline: auto;
+  max-width: var(--container-6xl);
+  padding-inline: --spacing(5);
+  padding-block: --spacing(12);
+  scroll-margin-top: --spacing(10);
+  @variant sm {
+    padding-inline: --spacing(8);
+    padding-block: --spacing(16);
+  }
+}
+
+/* Faint engineering grid behind the page */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse at 50% 0%, black 30%, transparent 75%);
+}
+
+.text-gradient {
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Card with a gradient hairline border that brightens on hover */
+.card {
+  position: relative;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, var(--color-surface-2), var(--color-surface));
+  border: 1px solid var(--color-line);
+  transition:
+    border-color 0.3s,
+    transform 0.3s;
+}
+.card:hover {
+  border-color: rgb(94 234 212 / 0.35);
+  transform: translateY(-2px);
+}
+
+/* Scroll-reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes flow {
+  to {
+    background-position: 200% 0;
+  }
+}
+.pipeline-link {
+  background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  background-size: 200% 100%;
+  animation: flow 2.4s linear infinite;
+}
+
+/* Research detail modal */
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+.research-dialog[open] {
+  animation: dialog-in 0.25s ease-out;
+}
+.research-dialog::backdrop {
+  animation: fade-in 0.25s ease-out;
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-dialog[open],
+  .research-dialog::backdrop {
+    animation: none;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .pipeline-link {
+    animation: none;
+  }
+}

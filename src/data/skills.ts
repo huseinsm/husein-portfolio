@@ -36,4 +36,15 @@ export const skills: SkillGroup[] = [
       "Statistical Evaluation",
     ],
   },
+  {
+    title: "ML Libraries",
+    items: [
+      "PyTorch",
+      "TensorFlow",
+      "NumPy",
+      "pandas",
+      "Matplotlib",
+      "scikit-learn",
+    ],
+  },
 ];

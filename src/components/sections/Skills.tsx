@@ -13,7 +13,12 @@ export function Skills() {
       />
       <div className="grid gap-4 sm:grid-cols-2">
         {skills.map((group, i) => (
-          <Reveal key={group.title} delay={i * 80}>
+          <Reveal
+            key={group.title}
+            delay={i * 80}
+            // An odd last card spans both columns instead of sitting alone.
+            className={skills.length % 2 === 1 && i === skills.length - 1 ? "sm:col-span-2" : ""}
+          >
             <div className="card h-full p-6">
               <h3 className="flex items-center gap-3 font-medium">
                 <span className="font-mono text-xs text-accent">{String(i + 1).padStart(2, "0")}</span>

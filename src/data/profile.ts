@@ -12,7 +12,7 @@ export const profile = {
   },
   about: [
     "I'm an Information Technology student at Brawijaya University (BPI Scholarship awardee) and a member of the Intelligent System Laboratory, where I work on multimodal AI across computer vision, natural language processing, and speech.",
-    "My work spans from radiology vision-language models to Indonesian sign-language translation and fully local voice assistants — always with a focus on measurable results and research rigor.",
+    "My work spans from radiology vision-language models to Indonesian sign-language translation and a campus voice-assistant robot — always with a focus on measurable results and research rigor.",
   ],
   facts: [
     { label: "Currently", value: "Intelligent System Lab, Brawijaya University" },

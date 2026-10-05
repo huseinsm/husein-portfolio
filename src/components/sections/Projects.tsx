@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { categoryLabels, projects } from "@/data/projects";
+import Image from "next/image";
+import { categoryLabels, projects, projectStories } from "@/data/projects";
 import { research } from "@/data/research";
 import type { Project, ProjectCategory, ResearchItem } from "@/lib/types";
 import { ArrowIcon, GitHubIcon } from "@/components/ui/Icons";
@@ -12,6 +13,8 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 type Filter = "all" | ProjectCategory;
 
 const FILTERS: Filter[] = ["all", "cv", "nlp", "ml", "data"];
+
+const STORIES: ResearchItem[] = [...research, ...projectStories];
 
 export function Projects() {
   const [filter, setFilter] = useState<Filter>("all");
@@ -54,10 +57,10 @@ export function Projects() {
 
       {researchCards.length > 0 && (
         <>
-          <GroupLabel>Research · click for the full story</GroupLabel>
-          <ul className="mb-12 grid gap-4 md:grid-cols-3">
+          <GroupLabel>Featured · click for the full story</GroupLabel>
+          <ul className="mb-12 grid gap-4 md:grid-cols-2">
             {researchCards.map((p) => {
-              const item = research.find((r) => r.code === p.research);
+              const item = STORIES.find((r) => r.code === p.research);
               return (
                 <li key={p.title}>
                   <button
@@ -65,8 +68,21 @@ export function Projects() {
                     onClick={() => item && setOpen(item)}
                     className="card group relative flex h-full w-full flex-col overflow-hidden p-6 text-left"
                   >
+                    {p.cover && (
+                      <div className="relative -mx-6 -mt-6 mb-6 aspect-[16/9] overflow-hidden border-b border-line">
+                        <Image
+                          src={p.cover.src}
+                          alt=""
+                          fill
+                          sizes="(min-width: 1152px) 540px, (min-width: 768px) 50vw, 100vw"
+                          placeholder="blur"
+                          style={{ objectPosition: p.cover.position }}
+                          className="object-cover transition duration-500 group-hover:scale-[1.03]"
+                        />
+                      </div>
+                    )}
                     <span
-                      className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent"
+                      className="pointer-events-none absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent"
                       aria-hidden
                     />
                     <CardTop project={p} />

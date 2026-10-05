@@ -1,5 +1,18 @@
 import type { ResearchItem } from "@/lib/types";
 
+import safetyArchitecture from "@/assets/projects/safety-layer/architecture.png";
+import safetyDispatchComparison from "@/assets/projects/safety-layer/dispatch-comparison.jpg";
+import safetyLayerFigure from "@/assets/projects/safety-layer/safety-layer.jpg";
+import safetyCaseStudy from "@/assets/projects/safety-layer/case-study.jpg";
+import safetyDemo from "@/assets/projects/safety-layer/vila-m3-demo.jpg";
+import broneArchitecture from "@/assets/projects/brone/architecture.png";
+import broneRobot from "@/assets/projects/brone/robot.jpg";
+import broneExhibition from "@/assets/projects/brone/exhibition.jpg";
+import signesiaArchitecture from "@/assets/projects/signesia/architecture.png";
+import signesiaPromo from "@/assets/projects/signesia/promo.jpg";
+import signesiaHome from "@/assets/projects/signesia/home.jpg";
+import signesiaVoiceToSign from "@/assets/projects/signesia/voice-to-sign.jpg";
+
 export const research: ResearchItem[] = [
   {
     code: "SAFETY-LAYER",
@@ -12,10 +25,15 @@ export const research: ResearchItem[] = [
     period: "Aug 2026 — Ongoing",
     status: "Ongoing",
     pipeline: ["Image + Query", "BioMedCLIP", "MLP Router", "Confidence Gate", "VILA-M3 Expert"],
+    architecture: {
+      src: safetyArchitecture,
+      caption:
+        "Safety layer architecture: frozen BioMedCLIP encoders read the image and the query, an MLP router picks the expert, and a calibrated confidence gate decides whether to call it.",
+    },
     highlight: { value: "8% → 0%", label: "expert mis-dispatch rate" },
     details: {
       problem:
-        "Picture a clinician uploading an abdominal CT scan, and the AI quietly runs a brain-tumor segmentation model on it. The mask looks clean and convincing, yet it means nothing clinically. VILA-M3, NVIDIA and MONAI's radiology vision-language model, picks its specialist models by writing a special token into its own free-text answer, which a regex then parses. We measured how often that goes wrong: overall routing accuracy was 73%, chest X-ray requests were routed correctly only 36% of the time, and 8% of requests triggered an expert that should never have run.",
+        "Picture a clinician uploading an abdominal CT scan, and the AI quietly runs a brain-tumor segmentation model on it. The mask looks clean and convincing, yet it means nothing clinically. VILA-M3, NVIDIA and MONAI's radiology vision-language model, picks its specialist models by writing a special token into its own free-text answer, which a regex then parses. We measured how often that goes wrong on 200 samples: overall routing accuracy was 73%, chest X-ray requests were routed correctly only 36% of the time, and 8% of requests triggered an expert that should never have run.",
       approach: [
         {
           title: "Take the decision away from the generator",
@@ -45,8 +63,38 @@ export const research: ResearchItem[] = [
         "Ran inference over the evaluation set and stored every VLM response",
         "Analyzed the responses to measure how often, and why, the built-in expert routing failed",
       ],
-      stack: ["PyTorch", "BioMedCLIP", "VILA-M3", "MONAI", "Temperature scaling"],
-      next: "Written up as a scientific paper for GEMASTIK 2026.",
+      stack: [
+        "Python",
+        "PyTorch",
+        "BioMedCLIP",
+        "VILA-M3",
+        "MONAI (VISTA3D, BRATS)",
+        "TorchXRayVision",
+        "Temperature scaling",
+      ],
+      gallery: [
+        {
+          src: safetyDispatchComparison,
+          caption:
+            "Expert dispatch, before and after: (a) original VILA-M3, where the expert token and the regex parser are the failure points; (b) the proposed design with a confidence-gated router.",
+          wide: true,
+        },
+        {
+          src: safetyLayerFigure,
+          caption: "The safety layer: BioMedCLIP encoders, MLP router, and confidence gate.",
+        },
+        {
+          src: safetyCaseStudy,
+          caption:
+            "Case study: (a) VISTA3D is called when max(p) = 0.97 ≥ τ; (b) the call is withheld when max(p) = 0.41 < τ.",
+        },
+        {
+          src: safetyDemo,
+          caption: "VILA-M3 demo (MONAI): abdominal CT organ segmentation by the VISTA3D expert.",
+          wide: true,
+        },
+      ],
+      next: "The paper is a finalist in GEMASTIK XIX 2026, Scientific Paper category.",
     },
   },
   {
@@ -58,23 +106,33 @@ export const research: ResearchItem[] = [
     affiliation: "Brawijaya University",
     period: "Aug 2026 — Ongoing",
     status: "Ongoing",
-    pipeline: ["Microphone", "RNNoise", "Faster Whisper", "LLM", "TTS"],
+    pipeline: ["Microphone", "RNNoise", "Faster Whisper", "DeepSeek V4 Flash", "Piper TTS"],
+    architecture: {
+      src: broneArchitecture,
+      caption:
+        "BRONE voice pipeline: from the visitor's voice through noise suppression, speech recognition and the campus-knowledge LLM to a spoken answer and the robot's facial expression.",
+    },
+    repo: "https://github.com/yukienjoyer7/brone-talk-nuc",
     contributions: [
       "ASR — Benchmarked Faster Whisper tiny/base/small on an Intel NUC and cut live word-error rate from 17.1% to 7.2% with real-time noise suppression (RNNoise) and domain-aware handling of BRONE, FILKOM, and Brawijaya terms.",
-      "LLM — Tackled the ~26 s response latency of the GPT-4o baseline. Experimented with a local Qwen 3.5 0.8B model, which was fast but lacked reasoning quality, then moved to DeepSeek V4 Flash — smart, cheap, and fast.",
+      "LLM — Traced 91–95% of the cloud baseline's 17–25 s median response time to the LLM. Tested a local Qwen3.5-0.8B model, which was fast (635 ms to first token) but weak on campus knowledge, then moved to DeepSeek V4 Flash — smart, cheap, and fast.",
     ],
     highlight: { value: "17.1% → 7.2%", label: "live word-error rate" },
     details: {
       problem:
-        "BRONE is Brawijaya University's campus robot. Visitors walk up, say “halo”, and ask it things in Indonesian. The first version ran entirely on cloud APIs and took 17–29 seconds to answer, which feels like forever when you're standing in front of a robot. It also kept mishearing its own name and the campus it lives on, turning BRONE into “Brown” and garbling FILKOM and Brawijaya.",
+        "BRONE is Brawijaya University's campus robot. Visitors walk up, say “halo”, and ask it things in Indonesian. The first version ran entirely on cloud APIs and took a median of 17–25 seconds to start answering, which feels like forever when you're standing in front of a robot. It also kept mishearing its own name and the campus it lives on, turning BRONE into “Brown” and garbling FILKOM and Brawijaya.",
       approach: [
+        {
+          title: "One conversation, end to end",
+          body: "After a visitor says “halo”, RNNoise cleans the audio, Faster Whisper transcribes it, DeepSeek V4 Flash answers from a Brawijaya knowledge base, and Piper TTS speaks the reply while the robot's screen face changes expression over MQTT.",
+        },
         {
           title: "Find where the time goes",
           body: "I broke the cloud pipeline's latency down stage by stage. Speech-to-text (~1.5 s) and text-to-speech (~1.7 s) were not the problem. The LLM call alone took 91–95% of the time until the robot started speaking.",
         },
         {
           title: "Try a small local model",
-          body: "Qwen 3.5 0.8B on a Jetson Orin Nano answered fast (median time to first token 635 ms, no memory swapping) but got campus-knowledge questions wrong. The team moved to DeepSeek V4 Flash, which is fast, cheap, and actually correct.",
+          body: "Qwen3.5-0.8B on a Jetson Orin Nano answered fast (median time to first token 635 ms, no memory swapping) but got campus-knowledge questions wrong. The team moved to DeepSeek V4 Flash, which is fast, cheap, and actually correct.",
         },
         {
           title: "Benchmark speech recognition on the edge",
@@ -97,10 +155,26 @@ export const research: ResearchItem[] = [
       ],
       myRole: [
         "Owned speech-to-text: benchmark harness, model sweep, prompt biasing, noise suppression",
-        "Led the week-1 latency breakdown that pointed the team at the LLM",
+        "Led the latency breakdown that pointed the team at the LLM",
         "Tested local vs. cloud LLMs for latency and answer quality",
       ],
-      stack: ["Python", "Faster Whisper", "CTranslate2", "RNNoise", "Jetson Orin Nano", "Intel NUC", "DeepSeek", "Qwen"],
+      stack: [
+        "Python",
+        "Faster Whisper",
+        "CTranslate2",
+        "RNNoise",
+        "DeepSeek V4 Flash",
+        "Qwen3.5 (Ollama)",
+        "Piper TTS",
+        "MQTT",
+        "ROS 2",
+        "Jetson Orin Nano",
+        "Intel NUC",
+      ],
+      gallery: [
+        { src: broneRobot, caption: "BRONE, with its expressive face on the screen." },
+        { src: broneExhibition, caption: "BRONE talking with visitors at an exhibition." },
+      ],
       next: "Deploying the tuned recognizer on the robot and measuring latency on its own hardware.",
     },
   },
@@ -113,38 +187,64 @@ export const research: ResearchItem[] = [
     affiliation: "Brawijaya University",
     period: "Jul 2026 — Ongoing",
     status: "Ongoing",
-    pipeline: ["QR Artifact", "Dialect", "Text-to-Gloss", "Skeleton Animation"],
+    pipeline: ["Voice / QR", "Speech-to-Text", "Text-to-Gloss", "Sign Lookup", "Skeleton Avatar"],
+    architecture: {
+      src: signesiaArchitecture,
+      caption:
+        "SIGNESIA pipeline: voice or QR input becomes Indonesian text, the eight-stage Adaptive SOPK rules turn it into BISINDO glosses, and a skeleton avatar signs them.",
+    },
+    contributions: [
+      "Text-to-Gloss — Built an eight-stage rule system that raised gloss-order agreement with human evaluator corrections from Kendall τ 0.36 to 0.53, at a median 173 ms per sentence on a CPU.",
+    ],
+    highlight: { value: "0.36 → 0.53", label: "gloss-order agreement (Kendall τ)" },
     details: {
       problem:
-        "Signesia turns spoken or written Indonesian into BISINDO, Indonesian Sign Language, performed by an animated signing avatar. Sign language is not word-for-word Indonesian. It has its own vocabulary and grammar, with no affixes and a different word order, so a sentence first has to become a sequence of glosses (sign labels) in BISINDO order. That text-to-gloss step is mine.",
+        "Signesia opens up Indonesian culture to Deaf people through BISINDO, Indonesian Sign Language. Users can scan a QR code on a cultural artifact, turn speech into sign in real time with a choice of regional dialect, browse a culture library, and learn BISINDO. Sign language is not word-for-word Indonesian. It has its own vocabulary and grammar, with no affixes and a different word order, so a sentence first has to become a sequence of glosses (sign labels) in BISINDO order. That text-to-gloss step is mine.",
       approach: [
         {
           title: "Understand where current models fall short",
-          body: "Automatic metrics like BLEU looked good, but human evaluators often felt the meaning was lost. I dug into both the models and their training data to find out why.",
+          body: "Automatic metrics like BLEU looked good, but human evaluators often felt the meaning was lost. The cause was in the training data: the old labeling rule sorted most words alphabetically, so the models learned to copy that order.",
         },
         {
           title: "Learn from human corrections",
           body: "Evaluator corrections revealed how BISINDO sentences are really ordered. Time words come first, question words go last, and commands open with words like AYO or TOLONG.",
         },
         {
-          title: "Grammar-aware rules",
-          body: "Building on BISINDO linguistics research and guidance from my advisors, I'm designing a rule system that adapts word order to the type of sentence, with a lightweight classifier choosing the right pattern.",
+          title: "Adaptive SOPK rules",
+          body: "Built on BISINDO linguistics research and my advisors' guidance, the rules run in eight stages: normalize slang and non-standard words, merge multi-word phrases, parse with Stanza, classify the sentence type, arrange the SOPK structure (subject, object, predicate, adverbial), select the words to sign, reduce them to base forms, and check them against the sign vocabulary.",
         },
         {
           title: "Only glosses that can be signed",
-          body: "Every word is reduced to a base form that exists in the sign vocabulary. Words with no sign fall back to fingerspelling.",
+          body: "Every gloss is checked against the sign vocabulary of 1,033 signs, recorded from native signers and extracted with MediaPipe Holistic. Words with no sign fall back to fingerspelling.",
         },
       ],
       results: [
-        { value: "Real-time", label: "rule-based glossing runs in milliseconds on a CPU" },
+        { value: "0.36 → 0.53", label: "Kendall τ order agreement with evaluator corrections, vs. the old alphabetical rule" },
+        { value: "173 ms", label: "median latency per sentence on a CPU" },
+        { value: "1,033", label: "signs in the avatar's skeleton vocabulary" },
         { value: "Human-first", label: "evaluated on whether the meaning comes across, not just BLEU" },
       ],
       myRole: [
         "Owner of the text-to-gloss stage",
-        "Analysis of previous models and data",
-        "Design of the gloss rule system",
+        "Analysis of previous models and their training data",
+        "Design and implementation of the gloss rule system, with a Python API, CLI, and FastAPI service",
       ],
-      stack: ["Python", "Stanza", "Sastrawi", "scikit-learn"],
+      stack: ["Python", "Stanza", "Sastrawi", "scikit-learn", "FastAPI", "MediaPipe Holistic"],
+      gallery: [
+        {
+          src: signesiaPromo,
+          caption: "SIGNESIA: a digital platform for inclusive cultural literacy for the Deaf community.",
+        },
+        {
+          src: signesiaHome,
+          caption: "App home: Scan Artifact, Voice to Sign, Culture Library, and Learn BISINDO.",
+        },
+        {
+          src: signesiaVoiceToSign,
+          caption: "Real-time Voice to Sign: “selamat malam” (good evening) performed by the skeleton avatar.",
+          wide: true,
+        },
+      ],
       next: "Validating the rules with BISINDO experts.",
     },
   },

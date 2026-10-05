@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { categoryLabels } from "@/data/projects";
 import type { ResearchItem } from "@/lib/types";
+import { GitHubIcon } from "./Icons";
+import { MediaFigure } from "./MediaFigure";
 
 interface ResearchDialogProps {
   item: ResearchItem | null;
@@ -33,7 +35,7 @@ export function ResearchDialog({ item, onClose }: ResearchDialogProps) {
       // A click that lands on the dialog element itself is a click on the backdrop.
       onClick={(e) => e.target === e.currentTarget && ref.current?.close()}
       aria-labelledby="research-dialog-title"
-      className="research-dialog m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-3xl overflow-y-auto rounded-2xl border border-line bg-surface p-0 text-fg backdrop:bg-black/70 backdrop:backdrop-blur-sm"
+      className="research-dialog m-auto max-h-[90vh] w-[calc(100%-2rem)] max-w-4xl overflow-y-auto rounded-2xl border border-line bg-surface p-0 text-fg backdrop:bg-black/70 backdrop:backdrop-blur-sm"
     >
       {item && (
         <article className="p-6 sm:p-10">
@@ -47,7 +49,7 @@ export function ResearchDialog({ item, onClose }: ResearchDialogProps) {
                   </span>
                 ))}
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-accent/30 bg-accent/10 px-2.5 py-0.5 text-accent">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-accent" />
+                  <span className={`h-1.5 w-1.5 rounded-full bg-accent ${item.status === "Ongoing" ? "animate-pulse" : ""}`} />
                   {item.status}
                 </span>
               </div>
@@ -70,18 +72,22 @@ export function ResearchDialog({ item, onClose }: ResearchDialogProps) {
 
           <p className="mt-8 text-[15px] leading-relaxed text-fg/85">{item.details.problem}</p>
 
-          <div className="mt-8 overflow-x-auto pb-1">
-            <ol className="flex min-w-max items-center font-mono text-xs">
-              {item.pipeline.map((step, idx) => (
-                <li key={step} className="flex items-center">
-                  <span className="rounded-lg border border-line bg-bg/70 px-3 py-2 text-fg/85">{step}</span>
-                  {idx < item.pipeline.length - 1 && (
-                    <span className="pipeline-link mx-1 h-px w-6 sm:w-10" aria-hidden />
-                  )}
-                </li>
-              ))}
-            </ol>
-          </div>
+          {item.architecture ? (
+            <MediaFigure media={item.architecture} diagram sizes="(min-width: 896px) 816px, 100vw" className="mt-8" />
+          ) : (
+            <div className="mt-8 overflow-x-auto pb-1">
+              <ol className="flex min-w-max items-center font-mono text-xs">
+                {item.pipeline.map((step, idx) => (
+                  <li key={step} className="flex items-center">
+                    <span className="rounded-lg border border-line bg-bg/70 px-3 py-2 text-fg/85">{step}</span>
+                    {idx < item.pipeline.length - 1 && (
+                      <span className="pipeline-link mx-1 h-px w-6 sm:w-10" aria-hidden />
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
 
           <h3 className="mt-10 font-mono text-xs tracking-widest text-accent uppercase">How it works</h3>
           <ol className="mt-5 space-y-6">
@@ -120,6 +126,22 @@ export function ResearchDialog({ item, onClose }: ResearchDialogProps) {
             </>
           )}
 
+          {item.details.gallery && (
+            <>
+              <h3 className="mt-10 font-mono text-xs tracking-widest text-accent uppercase">Documentation</h3>
+              <div className="mt-5 grid items-start gap-x-4 gap-y-6 sm:grid-cols-2">
+                {item.details.gallery.map((m) => (
+                  <MediaFigure
+                    key={m.src.src}
+                    media={m}
+                    sizes={m.wide ? "(min-width: 896px) 816px, 100vw" : "(min-width: 896px) 400px, (min-width: 640px) 50vw, 100vw"}
+                    className={m.wide ? "sm:col-span-2" : ""}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
           <div className="mt-10 flex flex-wrap gap-1.5">
             {item.details.stack.map((t) => (
               <span key={t} className="rounded border border-line px-2 py-0.5 font-mono text-[11px] text-muted">
@@ -129,19 +151,31 @@ export function ResearchDialog({ item, onClose }: ResearchDialogProps) {
           </div>
 
           <dl className="mt-8 grid gap-4 border-t border-line pt-6 text-sm sm:grid-cols-3">
-            <div>
-              <dt className="text-xs text-muted">Role</dt>
-              <dd className="mt-1 text-fg/90">{item.role}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-muted">Affiliation</dt>
-              <dd className="mt-1 text-fg/90">{item.affiliation}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-muted">Period</dt>
-              <dd className="mt-1 text-fg/90">{item.period}</dd>
-            </div>
+            {[
+              ["Role", item.role],
+              ["Affiliation", item.affiliation],
+              ["Period", item.period],
+            ]
+              .filter(([, value]) => value)
+              .map(([label, value]) => (
+                <div key={label}>
+                  <dt className="text-xs text-muted">{label}</dt>
+                  <dd className="mt-1 text-fg/90">{value}</dd>
+                </div>
+              ))}
           </dl>
+
+          {item.repo && (
+            <a
+              href={item.repo}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-6 inline-flex items-center gap-2 rounded-full border border-line px-4 py-2 font-mono text-xs text-fg/80 transition hover:border-accent/50 hover:text-accent"
+            >
+              <GitHubIcon className="h-4 w-4" />
+              {item.repo.replace("https://", "")}
+            </a>
+          )}
 
           {item.details.next && (
             <p className="mt-6 rounded-xl border border-accent/20 bg-accent/5 px-4 py-3 text-sm text-fg/80">

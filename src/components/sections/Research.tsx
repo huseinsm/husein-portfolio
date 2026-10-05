@@ -1,5 +1,6 @@
 import { categoryLabels } from "@/data/projects";
 import { research } from "@/data/research";
+import { MediaFigure } from "@/components/ui/MediaFigure";
 import { Reveal } from "@/components/ui/Reveal";
 import { ResearchStoryButton } from "@/components/ui/ResearchStoryButton";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -11,7 +12,7 @@ export function Research() {
         index="03"
         eyebrow="Research"
         title="Ongoing research."
-        description="Current research work, with the pipeline and my role in each. Open any of them for the full story: the problem, how it works, and the results so far."
+        description="Current research work, with the architecture and my role in each. Open any of them for the full story: the problem, how it works, and the results so far."
       />
       <div className="space-y-5">
         {research.map((r, i) => (
@@ -42,20 +43,29 @@ export function Research() {
                 )}
               </div>
 
-              <div className="mt-8 overflow-x-auto pb-1">
-                <ol className="flex min-w-max items-center font-mono text-xs">
-                  {r.pipeline.map((step, idx) => (
-                    <li key={step} className="flex items-center">
-                      <span className="rounded-lg border border-line bg-bg/70 px-3 py-2 text-fg/85">
-                        {step}
-                      </span>
-                      {idx < r.pipeline.length - 1 && (
-                        <span className="pipeline-link mx-1 h-px w-8 sm:w-12" aria-hidden />
-                      )}
-                    </li>
-                  ))}
-                </ol>
-              </div>
+              {r.architecture ? (
+                <MediaFigure
+                  media={r.architecture}
+                  diagram
+                  sizes="(min-width: 1152px) 1024px, 100vw"
+                  className="mt-8"
+                />
+              ) : (
+                <div className="mt-8 overflow-x-auto pb-1">
+                  <ol className="flex min-w-max items-center font-mono text-xs">
+                    {r.pipeline.map((step, idx) => (
+                      <li key={step} className="flex items-center">
+                        <span className="rounded-lg border border-line bg-bg/70 px-3 py-2 text-fg/85">
+                          {step}
+                        </span>
+                        {idx < r.pipeline.length - 1 && (
+                          <span className="pipeline-link mx-1 h-px w-8 sm:w-12" aria-hidden />
+                        )}
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
 
               {r.contributions && (
                 <ul className="mt-8 space-y-3 text-sm leading-relaxed text-fg/80">

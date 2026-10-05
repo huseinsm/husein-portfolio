@@ -115,12 +115,12 @@ export const research: ResearchItem[] = [
     repo: "https://github.com/yukienjoyer7/brone-talk-nuc",
     contributions: [
       "ASR — Benchmarked Faster Whisper tiny/base/small on an Intel NUC and cut live word-error rate from 17.1% to 7.2% with real-time noise suppression (RNNoise) and domain-aware handling of BRONE, FILKOM, and Brawijaya terms.",
-      "LLM — Traced 91–95% of the cloud baseline's 17–25 s median response time to the LLM. Tested a local Qwen3.5-0.8B model, which was fast (635 ms to first token) but weak on campus knowledge, then moved to DeepSeek V4 Flash — smart, cheap, and fast.",
+      "LLM — Traced 91–95% of the cloud baseline's response time (median 17.1 s with GPT-4o, 25.2 s with gpt-audio-mini) to the LLM. Tested a local Qwen3.5-0.8B model, which was fast (635 ms to first token) but weak on campus knowledge, then moved to DeepSeek V4 Flash — smart, cheap, and fast.",
     ],
     highlight: { value: "17.1% → 7.2%", label: "live word-error rate" },
     details: {
       problem:
-        "BRONE is Brawijaya University's campus robot. Visitors walk up, say “halo”, and ask it things in Indonesian. The first version ran entirely on cloud APIs and took a median of 17–25 seconds to start answering, which feels like forever when you're standing in front of a robot. It also kept mishearing its own name and the campus it lives on, turning BRONE into “Brown” and garbling FILKOM and Brawijaya.",
+        "BRONE is Brawijaya University's campus robot. Visitors walk up, say “halo”, and ask it things in Indonesian. The first version ran entirely on cloud APIs and took a median of 17.1 seconds to start answering with GPT-4o, and 25.2 seconds with the single-call gpt-audio-mini mode, which feels like forever when you're standing in front of a robot. It also kept mishearing its own name and the campus it lives on, turning BRONE into “Brown” and garbling FILKOM and Brawijaya.",
       approach: [
         {
           title: "One conversation, end to end",
